@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Counter</string>
+    <string name="password">Password</string>
+    <string name="sign_in">SIGN IN</string>
+    <string name="register_now">Not a member? Click here to register</string>
+    <string name="username">Username</string>
+    <string name="confirm_password">Confirm Password</string>
+    <string name="register">REGISTER</string>
+</resources>
