@@ -1,15 +1,19 @@
 package com.example.counter;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import kotlin.Metadata;
-import kotlin.jvm.internal.Intrinsics;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.FormBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -21,11 +25,12 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
 import org.json.JSONObject;
 import java.io.IOException;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -34,6 +39,7 @@ public class LoginActivity extends AppCompatActivity {
     private Button buttonSignIn, buttonRegister;
     private String responseBody, token;
     private JSONObject obj;
+    public SharedPreferences sharedPref;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,7 +51,7 @@ public class LoginActivity extends AppCompatActivity {
         buttonSignIn = findViewById(R.id.buttonSignIn);
         TextView textRegisterNow = findViewById(R.id.textClickToRegister);
 
-        buttonSignIn.setOnClickListener(v -> checkCredentials());
+        buttonSignIn.setOnClickListener(v -> Login(loginUsernameInput.getText().toString(), loginPasswordInput.getText().toString(), true));
         textRegisterNow.setOnClickListener(v -> RegisterForm());
     }
 
@@ -59,55 +65,64 @@ public class LoginActivity extends AppCompatActivity {
         popupWindow.showAtLocation(findViewById(R.id.loginUsernameInput), Gravity.CENTER, 0, 1);
         DimBackground.Dim(popupWindow);
 
-        buttonRegister = findViewById(R.id.buttonRegister);
+        buttonRegister = popupView.findViewById(R.id.buttonRegister);
+        registerUsernameInput = popupView.findViewById(R.id.registerInputUsername);
+        registerPasswordInput = popupView.findViewById(R.id.registerInputPassword);
+        registerPasswordCheck = popupView.findViewById(R.id.registerInputConfirmPassword);
 
         buttonRegister.setOnClickListener(v -> {
-            FormBody formBody = new FormBody.Builder()
-                    .add("username", registerUsernameInput.getText().toString())
-                    .add("email", registerUsernameInput.getText().toString())
-                    .add("password", registerPasswordInput.getText().toString())
-                    .build();
+            if(checkInput()){
+                FormBody formBody = new FormBody.Builder()
+                        .add("username", registerUsernameInput.getText().toString())
+                        .add("email", registerUsernameInput.getText().toString())
+                        .add("password", registerPasswordInput.getText().toString())
+                        .build();
 
-            Request request = new Request.Builder()
-                    .url("https://wallet-go-webapi.herokuapp.com/v1/auth/register")
-                    .post(formBody)
-                    .build();
+                Request request = new Request.Builder()
+                        .url("https://wallet-go-webapi.herokuapp.com/v1/auth/register")
+                        .post(formBody)
+                        .build();
 
-            client.newCall(request).enqueue(new Callback() {
-                @Override
-                public void onFailure(@NonNull Call call, @NonNull IOException e) {
-                    e.printStackTrace();
-                    Toast.makeText(LoginActivity. "Couldn't connect to database", Toast.LENGTH_SHORT).show();
-                }
-                @Override
-                public void onResponse(@NonNull Call call, @NonNull Response response) {
-                    try {
-                        responseBody= Objects.requireNonNull(response.body()).string();
-                    } catch (IOException e) {
+                client.newCall(request).enqueue(new Callback() {
+                    @Override
+                    public void onFailure(@NonNull Call call, @NonNull IOException e) {
                         e.printStackTrace();
+                        Toast.makeText(getBaseContext(), "Couldn't connect to database", Toast.LENGTH_SHORT).show();
                     }
-                    if (!responseBody.contains("token")){
-                        showError(loginUsernameInput, "Incorrect username or password");
-                    }
-                    else{
-                        try {
-                            obj = new JSONObject(responseBody);
-                            token = obj.getString("token");
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                        System.out.println(token);
-                    }
-                }
-            });
-        });
+                    @Override
+                    public void onResponse(@NonNull Call call, @NonNull Response response) {
+                        if (!response.isSuccessful()){
+                            Toast.makeText(getBaseContext(), "Unexpected error", Toast.LENGTH_SHORT).show();
 
+                        }
+                        else{
+                            Login(registerUsernameInput.getText().toString(), registerPasswordInput.getText().toString(), false);
+                        }
+                    }
+                });
+            }
+        });
     }
 
-    private void checkCredentials() {
+    private boolean checkInput() {
+        if (registerUsernameInput.getText().toString().isEmpty()){
+            showError(registerUsernameInput, "This field can't be empty");
+            return false;
+        }
+        else if(registerPasswordInput.getText().toString().isEmpty()){
+            showError(registerPasswordInput, "This field can't be empty");
+            return false;
+        }
+        else if (!registerPasswordInput.getText().toString().equals(registerPasswordCheck.getText().toString())){
+            showError(registerPasswordCheck, "Password doesn't match");
+            return false;
+        }
+        else{
+            return true;
+        }
+    }
 
-        String loginUsername = loginUsernameInput.getText().toString();
-        String loginPassword = loginPasswordInput.getText().toString();
+    private void Login(String loginUsername, String loginPassword, boolean check) {
 
         FormBody formBody = new FormBody.Builder()
                 .add("email", loginUsername)
@@ -123,7 +138,7 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
                e.printStackTrace();
-
+                Toast.makeText(getBaseContext(), "Couldn't connect to database", Toast.LENGTH_SHORT).show();
             }
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) {
@@ -142,7 +157,20 @@ public class LoginActivity extends AppCompatActivity {
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                   System.out.println(token);
+                    sharedPref = getPreferences(Context.MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sharedPref.edit();
+                    editor.putString(token, "");
+                    editor.apply();
+                    System.out.println(token);
+                    runOnUiThread(()->Toast.makeText(getBaseContext(), "Logged in successfully", Toast.LENGTH_SHORT).show());
+                    if (check){
+
+                    }
+                    else
+                    {
+                        Intent intent = new Intent(getBaseContext(), FirstTimeLoginActivity.class);
+                        startActivity(intent);
+                    }
                 }
             }
         });
