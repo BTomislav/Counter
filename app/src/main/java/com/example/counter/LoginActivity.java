@@ -1,7 +1,6 @@
 package com.example.counter;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -9,8 +8,6 @@ import okhttp3.FormBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -24,19 +21,16 @@ import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 import java.io.IOException;
-import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
+
 
 public class LoginActivity extends AppCompatActivity {
 
     private EditText loginUsernameInput, loginPasswordInput, registerUsernameInput, registerPasswordInput, registerPasswordCheck;
     private final OkHttpClient client = new OkHttpClient();
-    private Button buttonSignIn, buttonRegister;
     private String responseBody, token;
     private JSONObject obj;
     public SharedPreferences sharedPref;
@@ -48,7 +42,7 @@ public class LoginActivity extends AppCompatActivity {
 
         loginUsernameInput = findViewById(R.id.loginUsernameInput);
         loginPasswordInput = findViewById(R.id.loginPasswordInput);
-        buttonSignIn = findViewById(R.id.buttonSignIn);
+        Button buttonSignIn = findViewById(R.id.buttonSignIn);
         TextView textRegisterNow = findViewById(R.id.textClickToRegister);
 
         buttonSignIn.setOnClickListener(v -> Login(loginUsernameInput.getText().toString(), loginPasswordInput.getText().toString(), true));
@@ -65,7 +59,7 @@ public class LoginActivity extends AppCompatActivity {
         popupWindow.showAtLocation(findViewById(R.id.loginUsernameInput), Gravity.CENTER, 0, 1);
         DimBackground.Dim(popupWindow);
 
-        buttonRegister = popupView.findViewById(R.id.buttonRegister);
+        Button buttonRegister = popupView.findViewById(R.id.buttonRegister);
         registerUsernameInput = popupView.findViewById(R.id.registerInputUsername);
         registerPasswordInput = popupView.findViewById(R.id.registerInputPassword);
         registerPasswordCheck = popupView.findViewById(R.id.registerInputConfirmPassword);
@@ -93,7 +87,6 @@ public class LoginActivity extends AppCompatActivity {
                     public void onResponse(@NonNull Call call, @NonNull Response response) {
                         if (!response.isSuccessful()){
                             Toast.makeText(getBaseContext(), "Unexpected error", Toast.LENGTH_SHORT).show();
-
                         }
                         else{
                             Login(registerUsernameInput.getText().toString(), registerPasswordInput.getText().toString(), false);
@@ -102,24 +95,6 @@ public class LoginActivity extends AppCompatActivity {
                 });
             }
         });
-    }
-
-    private boolean checkInput() {
-        if (registerUsernameInput.getText().toString().isEmpty()){
-            showError(registerUsernameInput, "This field can't be empty");
-            return false;
-        }
-        else if(registerPasswordInput.getText().toString().isEmpty()){
-            showError(registerPasswordInput, "This field can't be empty");
-            return false;
-        }
-        else if (!registerPasswordInput.getText().toString().equals(registerPasswordCheck.getText().toString())){
-            showError(registerPasswordCheck, "Password doesn't match");
-            return false;
-        }
-        else{
-            return true;
-        }
     }
 
     private void Login(String loginUsername, String loginPassword, boolean check) {
@@ -147,9 +122,11 @@ public class LoginActivity extends AppCompatActivity {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+
                 if (!responseBody.contains("token")){
                     showError(loginUsernameInput, "Incorrect username or password");
                 }
+
                 else{
                     try {
                         obj = new JSONObject(responseBody);
@@ -157,12 +134,9 @@ public class LoginActivity extends AppCompatActivity {
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                    sharedPref = getPreferences(Context.MODE_PRIVATE);
-                    SharedPreferences.Editor editor = sharedPref.edit();
-                    editor.putString(token, "");
-                    editor.apply();
-                    System.out.println(token);
+                    SaveToken();
                     runOnUiThread(()->Toast.makeText(getBaseContext(), "Logged in successfully", Toast.LENGTH_SHORT).show());
+
                     if (check){
 
                     }
@@ -174,6 +148,31 @@ public class LoginActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    private boolean checkInput() {
+        if (registerUsernameInput.getText().toString().isEmpty()){
+            showError(registerUsernameInput, "This field can't be empty");
+            return false;
+        }
+        else if(registerPasswordInput.getText().toString().isEmpty()){
+            showError(registerPasswordInput, "This field can't be empty");
+            return false;
+        }
+        else if (!registerPasswordInput.getText().toString().equals(registerPasswordCheck.getText().toString())){
+            showError(registerPasswordCheck, "Password doesn't match");
+            return false;
+        }
+        else{
+            return true;
+        }
+    }
+
+    private void SaveToken() {
+        sharedPref = getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putString("token", token);
+        editor.apply();
     }
 
     private void showError(EditText input, String s) {
