@@ -12,7 +12,7 @@ class DimBackground {
             WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
             WindowManager.LayoutParams p = (WindowManager.LayoutParams) container.getLayoutParams();
             p.flags |= WindowManager.LayoutParams.FLAG_DIM_BEHIND;
-            p.dimAmount = 0.5f;
+            p.dimAmount = 0.6f;
             wm.updateViewLayout(container, p);
         }
     }

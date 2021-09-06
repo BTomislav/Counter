@@ -16,6 +16,7 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
@@ -30,10 +31,12 @@ import java.util.Objects;
 public class LoginActivity extends AppCompatActivity {
 
     private EditText loginUsernameInput, loginPasswordInput, registerUsernameInput, registerPasswordInput, registerPasswordCheck;
+    private CheckBox checkRememberMe;
     private final OkHttpClient client = new OkHttpClient();
     private String responseBody, token;
     private JSONObject obj;
     public SharedPreferences sharedPref;
+    private Intent intent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +45,7 @@ public class LoginActivity extends AppCompatActivity {
 
         loginUsernameInput = findViewById(R.id.loginUsernameInput);
         loginPasswordInput = findViewById(R.id.loginPasswordInput);
+        checkRememberMe = findViewById(R.id.checkRememberMe);
         Button buttonSignIn = findViewById(R.id.buttonSignIn);
         TextView textRegisterNow = findViewById(R.id.textClickToRegister);
 
@@ -93,7 +97,9 @@ public class LoginActivity extends AppCompatActivity {
                         }
                     }
                 });
+                popupWindow.dismiss();
             }
+
         });
     }
 
@@ -117,6 +123,7 @@ public class LoginActivity extends AppCompatActivity {
             }
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) {
+
                 try {
                     responseBody= Objects.requireNonNull(response.body()).string();
                 } catch (IOException e) {
@@ -134,17 +141,11 @@ public class LoginActivity extends AppCompatActivity {
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                    SaveToken();
-                    runOnUiThread(()->Toast.makeText(getBaseContext(), "Logged in successfully", Toast.LENGTH_SHORT).show());
-
-                    if (check){
-
-                    }
-                    else
-                    {
-                        Intent intent = new Intent(getBaseContext(), FirstTimeLoginActivity.class);
-                        startActivity(intent);
-                    }
+                    //Remember me?
+                    if (checkRememberMe.isChecked()) SaveToken();
+                    //First time login?
+                    intent = (check) ? new Intent(getBaseContext(), CounterActivity.class) : new Intent(getBaseContext(), FirstTimeLoginActivity.class);
+                    startActivity(intent);
                 }
             }
         });
@@ -169,7 +170,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void SaveToken() {
-        sharedPref = getPreferences(Context.MODE_PRIVATE);
+        sharedPref = getSharedPreferences("LoginInfo", MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putString("token", token);
         editor.apply();

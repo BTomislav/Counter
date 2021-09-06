@@ -5,21 +5,22 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.media.session.MediaSession;
 import android.os.Bundle;
 import android.widget.Button;
+import android.widget.Toast;
 
-public class FirstTimeLoginActivity extends AppCompatActivity {
+public class CounterActivity extends AppCompatActivity {
 
-    private SharedPreferences sharedPref;
-
+    SharedPreferences sharedPref;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_first_time_login);
+        setContentView(R.layout.activity_counter);
 
-        Button button = findViewById(R.id.button2);
-        button.setOnClickListener(v -> {
-            sharedPref = getPreferences(Context.MODE_PRIVATE);
+        Button button = findViewById(R.id.button);
+        button.setOnClickListener(v->{
+            sharedPref = getSharedPreferences("LoginInfo", MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedPref.edit();
             editor.remove("token");
             editor.apply();

@@ -11,6 +11,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Counter">
         <activity
+            android:name=".CounterActivity"
+            android:exported="true" />
+        <activity
             android:name=".FirstTimeLoginActivity"
             android:exported="true" />
         <activity
