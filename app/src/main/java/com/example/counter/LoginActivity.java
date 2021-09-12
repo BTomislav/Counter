@@ -32,7 +32,7 @@ public class LoginActivity extends AppCompatActivity {
     private EditText loginUsernameInput, loginPasswordInput, registerUsernameInput, registerPasswordInput, registerPasswordCheck;
     private CheckBox checkRememberMe;
     private final OkHttpClient client = new OkHttpClient();
-    private String responseBody, token;
+    private String responseBody;
     private JSONObject obj;
     public SharedPreferences sharedPref;
     private Intent intent;
@@ -83,6 +83,7 @@ public class LoginActivity extends AppCompatActivity {
                     @Override
                     public void onFailure(@NonNull Call call, @NonNull IOException e) {
                         e.printStackTrace();
+                        runOnUiThread(() -> Toast.makeText(getBaseContext(), "Couldn't connect to database", Toast.LENGTH_SHORT).show());
                     }
                     @Override
                     public void onResponse(@NonNull Call call, @NonNull Response response) {
@@ -126,7 +127,7 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
                e.printStackTrace();
-                Toast.makeText(getBaseContext(), "Couldn't connect to database", Toast.LENGTH_SHORT).show();
+               runOnUiThread(() -> Toast.makeText(getBaseContext(), "Couldn't connect to database", Toast.LENGTH_SHORT).show());
             }
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) {
@@ -143,12 +144,14 @@ public class LoginActivity extends AppCompatActivity {
                 else{
                     try {
                         obj = new JSONObject(responseBody);
-                        token = obj.getString("accessToken");
+                        String token = obj.getString("accessToken");
+                        SaveToken(token);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
+
                     //Remember me?
-                    if (checkRememberMe.isChecked()) SaveToken();
+                    RememberMe(checkRememberMe.isChecked());
                     //First time login?
                     if (firstTime){
                         intent = new Intent(getBaseContext(), FirstTimeLoginActivity.class);
@@ -157,7 +160,6 @@ public class LoginActivity extends AppCompatActivity {
                     {
                         intent = new Intent(getBaseContext(), CounterActivity.class);
                     }
-                    //intent = (check) ? new Intent(getBaseContext(), CounterActivity.class) : new Intent(getBaseContext(), FirstTimeLoginActivity.class);
                     startActivity(intent);
                 }
             }
@@ -182,12 +184,18 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
-    private void SaveToken() {
+    private void SaveToken(String token) {
         sharedPref = getSharedPreferences("LoginInfo", MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putString("token", token);
         editor.apply();
-        System.out.println(token);
+    }
+
+    private void RememberMe(boolean check){
+        sharedPref = getSharedPreferences("LoginInfo", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putBoolean("rememberMe", check);
+        editor.apply();
     }
 
     private void showError(EditText input, String s) {

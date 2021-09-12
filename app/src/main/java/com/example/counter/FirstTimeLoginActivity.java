@@ -21,8 +21,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
+import android.widget.Toast;
 
 import java.io.IOException;
+import java.util.Objects;
 
 public class FirstTimeLoginActivity extends AppCompatActivity {
 
@@ -43,14 +45,6 @@ public class FirstTimeLoginActivity extends AppCompatActivity {
         buttonJoinLobby.setOnClickListener(v -> JoinLobby());
         buttonContinueWithoutLobby.setOnClickListener(v -> ContinueWithoutLobby());
 
-        /*button.setOnClickListener(v -> {
-            sharedPref = getPreferences(Context.MODE_PRIVATE);
-            SharedPreferences.Editor editor = sharedPref.edit();
-            editor.remove("token");
-            editor.apply();
-            Intent intent = new Intent(this, LoginActivity.class);
-            startActivity(intent);
-        });*/
     }
 
     private void ContinueWithoutLobby() {
@@ -68,15 +62,14 @@ public class FirstTimeLoginActivity extends AppCompatActivity {
         popupJoinLobby.showAtLocation(findViewById(R.id.buttonJoinLobby), Gravity.CENTER, 0, 1);
         DimBackground.Dim(popupJoinLobby);
 
-        EditText inputCode = findViewById(R.id.inputCode);
-        Button confirm = findViewById(R.id.buttonConfirmJoin);
+        EditText inputCode = popupView.findViewById(R.id.inputCode);
+        Button confirm = popupView.findViewById(R.id.buttonConfirmJoin);
 
         confirm.setOnClickListener(v -> {
             FormBody formBody = new FormBody.Builder()
                     .add("name", "")
                     .build();
         });
-
     }
 
     private void CreateLobby() {
@@ -89,36 +82,46 @@ public class FirstTimeLoginActivity extends AppCompatActivity {
         popupCreateLobby.showAtLocation(findViewById(R.id.buttonJoinLobby), Gravity.CENTER, 0, 1);
         DimBackground.Dim(popupCreateLobby);
 
-        EditText inputLobbyName = findViewById(R.id.inputLobbyName);
-        Button buttonConfirm = findViewById(R.id.buttonConfirmCreate);
+        EditText inputLobbyName = popupView.findViewById(R.id.inputLobbyName);
+        Button buttonConfirm = popupView.findViewById(R.id.buttonConfirmCreate);
 
         buttonConfirm.setOnClickListener(v -> {
             if (inputLobbyName.getText().toString().isEmpty()){
                 inputLobbyName.setError("This field can't be empty");
             }
             else{
+                sharedPref = getSharedPreferences("LoginInfo", MODE_PRIVATE);
+                String token = sharedPref.getString("token", "");
+
+                FormBody formBody = new FormBody.Builder()
+                        .add("name", inputLobbyName.getText().toString())
+                        .build();
+
                 Request request = new Request.Builder()
-                        .url("https://scoreboard-counter.azurewebsites.net/v1/auth/check-token")
-                        .addHeader("name", inputLobbyName.getText().toString())
-                        .get()
+                        .url("https://scoreboard-counter.azurewebsites.net/v1/lobby")
+                        .header("Authorization", "BEARER "+token)
+                        .post(formBody)
                         .build();
 
                 client.newCall(request).enqueue(new Callback() {
                     @Override
                     public void onFailure(@NonNull Call call, @NonNull IOException e) {
-
+                            e.printStackTrace();
+                            runOnUiThread(() -> Toast.makeText(getBaseContext(), "Couldn't connect to database", Toast.LENGTH_SHORT).show());
                     }
 
                     @Override
                     public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                        try {
+                            String responseBody= Objects.requireNonNull(response.body()).string();
+                            System.out.println(responseBody);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
 
                     }
                 });
-
-
             }
-
-
         });
     }
 }

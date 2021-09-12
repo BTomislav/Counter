@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="40dp">
+    android:padding="40dp"
+    android:background="@drawable/custom_popup_window_register">
 
     <TextView
         android:id="@+id/textView3"
@@ -19,13 +20,14 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <EditText
-        android:textAlignment="center"
-        android:hint="@string/example_name"
         android:id="@+id/inputLobbyName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:ems="10"
         android:layout_marginTop="12dp"
+        android:ems="10"
+        android:hint="@string/example_name"
+        android:minHeight="48dp"
+        android:textAlignment="center"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView3" />
@@ -36,9 +38,8 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
         android:text="@string/confirm"
-        android:ems="10"
+        android:minEms="10"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/inputLobbyName" />
 
