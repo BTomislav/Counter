@@ -2,13 +2,10 @@ package com.example.counter;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.media.session.MediaSession;
 import android.os.Bundle;
 import android.widget.Button;
-import android.widget.Toast;
 
 public class CounterActivity extends AppCompatActivity {
 

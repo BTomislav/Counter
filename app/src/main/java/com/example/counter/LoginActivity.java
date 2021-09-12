@@ -8,7 +8,6 @@ import okhttp3.FormBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -49,7 +48,7 @@ public class LoginActivity extends AppCompatActivity {
         Button buttonSignIn = findViewById(R.id.buttonSignIn);
         TextView textRegisterNow = findViewById(R.id.textClickToRegister);
 
-        buttonSignIn.setOnClickListener(v -> Login(loginUsernameInput.getText().toString(), loginPasswordInput.getText().toString(), true));
+        buttonSignIn.setOnClickListener(v -> Login(loginUsernameInput.getText().toString(), loginPasswordInput.getText().toString(), checkRememberMe.isChecked(), false));
         textRegisterNow.setOnClickListener(v -> RegisterForm());
     }
 
@@ -59,9 +58,9 @@ public class LoginActivity extends AppCompatActivity {
         View popupView = inflater.inflate(R.layout.register_form, null);
         int width = LinearLayout.LayoutParams.WRAP_CONTENT;
         int height = LinearLayout.LayoutParams.WRAP_CONTENT;
-        final PopupWindow popupWindow = new PopupWindow(popupView, width, height, true);
-        popupWindow.showAtLocation(findViewById(R.id.loginUsernameInput), Gravity.CENTER, 0, 1);
-        DimBackground.Dim(popupWindow);
+        PopupWindow popupRegister = new PopupWindow(popupView, width, height, true);
+        popupRegister.showAtLocation(findViewById(R.id.loginUsernameInput), Gravity.CENTER, 0, 1);
+        DimBackground.Dim(popupRegister);
 
         Button buttonRegister = popupView.findViewById(R.id.buttonRegister);
         registerUsernameInput = popupView.findViewById(R.id.registerInputUsername);
@@ -72,12 +71,11 @@ public class LoginActivity extends AppCompatActivity {
             if(checkInput()){
                 FormBody formBody = new FormBody.Builder()
                         .add("username", registerUsernameInput.getText().toString())
-                        .add("email", registerUsernameInput.getText().toString())
                         .add("password", registerPasswordInput.getText().toString())
                         .build();
 
                 Request request = new Request.Builder()
-                        .url("https://wallet-go-webapi.herokuapp.com/v1/auth/register")
+                        .url("https://scoreboard-counter.azurewebsites.net/v1/auth/register")
                         .post(formBody)
                         .build();
 
@@ -85,33 +83,42 @@ public class LoginActivity extends AppCompatActivity {
                     @Override
                     public void onFailure(@NonNull Call call, @NonNull IOException e) {
                         e.printStackTrace();
-                        Toast.makeText(getBaseContext(), "Couldn't connect to database", Toast.LENGTH_SHORT).show();
                     }
                     @Override
                     public void onResponse(@NonNull Call call, @NonNull Response response) {
-                        if (!response.isSuccessful()){
-                            Toast.makeText(getBaseContext(), "Unexpected error", Toast.LENGTH_SHORT).show();
-                        }
-                        else{
-                            Login(registerUsernameInput.getText().toString(), registerPasswordInput.getText().toString(), false);
+                        try {
+                            responseBody = Objects.requireNonNull(response.body()).string();
+                            JSONObject obj = new JSONObject(responseBody);
+                            if (obj.has("id")){
+                                String username=registerUsernameInput.getText().toString();
+                                String password=registerPasswordInput.getText().toString();
+                                runOnUiThread(popupRegister::dismiss);
+                                Login(username, password, false, true);
+                            }
+                            else {
+                                showError(registerUsernameInput, obj.getString("message"));
+                            }
+                        } catch (IOException | JSONException e) {
+                            e.printStackTrace();
+                            showError(registerUsernameInput, responseBody);
                         }
                     }
                 });
-                popupWindow.dismiss();
             }
-
         });
+
     }
 
-    private void Login(String loginUsername, String loginPassword, boolean check) {
+    private void Login(String loginUsername, String loginPassword, boolean check, boolean firstTime) {
 
         FormBody formBody = new FormBody.Builder()
-                .add("email", loginUsername)
+                .add("username", loginUsername)
                 .add("password", loginPassword)
+                .add("rememberMe", String.valueOf(check))
                 .build();
 
         Request request = new Request.Builder()
-                .url("https://wallet-go-webapi.herokuapp.com/v1/auth/login")
+                .url("https://scoreboard-counter.azurewebsites.net/v1/auth/login")
                 .post(formBody)
                 .build();
 
@@ -123,28 +130,34 @@ public class LoginActivity extends AppCompatActivity {
             }
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) {
-
                 try {
                     responseBody= Objects.requireNonNull(response.body()).string();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
 
-                if (!responseBody.contains("token")){
+                if (!responseBody.contains("accessToken")){
                     showError(loginUsernameInput, "Incorrect username or password");
                 }
 
                 else{
                     try {
                         obj = new JSONObject(responseBody);
-                        token = obj.getString("token");
+                        token = obj.getString("accessToken");
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
                     //Remember me?
                     if (checkRememberMe.isChecked()) SaveToken();
                     //First time login?
-                    intent = (check) ? new Intent(getBaseContext(), CounterActivity.class) : new Intent(getBaseContext(), FirstTimeLoginActivity.class);
+                    if (firstTime){
+                        intent = new Intent(getBaseContext(), FirstTimeLoginActivity.class);
+                    }
+                    else
+                    {
+                        intent = new Intent(getBaseContext(), CounterActivity.class);
+                    }
+                    //intent = (check) ? new Intent(getBaseContext(), CounterActivity.class) : new Intent(getBaseContext(), FirstTimeLoginActivity.class);
                     startActivity(intent);
                 }
             }
@@ -174,6 +187,7 @@ public class LoginActivity extends AppCompatActivity {
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putString("token", token);
         editor.apply();
+        System.out.println(token);
     }
 
     private void showError(EditText input, String s) {

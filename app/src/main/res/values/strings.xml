@@ -12,4 +12,12 @@
     <string name="create_lobby">CREATE LOBBY</string>
     <string name="or_join_lobby">OR join your friend\'s lobby. You just need his invite code!</string>
     <string name="join_lobby">JOIN LOBBY</string>
+    <string name="title_activity_splash_screen">SplashScreenActivity</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+    <string name="enter_the_lobby_code">Enter the lobby code below</string>
+    <string name="confirm">confirm</string>
+    <string name="enter_a_name_for_your_lobby">Enter a name for your lobby</string>
+    <string name="example_code">123456</string>
+    <string name="example_name">Example name</string>
 </resources>

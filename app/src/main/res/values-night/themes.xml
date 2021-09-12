@@ -14,4 +14,9 @@
         <item name="android:windowNoTitle">true</item>
         <!-- Customize your theme here. -->
     </style>
+
+    <style name="ThemeOverlay.Counter.FullscreenContainer" parent="">
+        <item name="fullscreenBackgroundColor">@color/light_blue_900</item>
+        <item name="fullscreenTextColor">@color/light_blue_A400</item>
+    </style>
 </resources>
