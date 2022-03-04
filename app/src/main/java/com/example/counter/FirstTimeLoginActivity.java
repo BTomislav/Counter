@@ -5,12 +5,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.FormBody;
-import okhttp3.OkHttp;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -23,6 +21,9 @@ import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.Toast;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
 import java.util.Objects;
 
@@ -30,6 +31,7 @@ public class FirstTimeLoginActivity extends AppCompatActivity {
 
     private SharedPreferences sharedPref;
     private Intent intent;
+    private String responseBody;
     private final OkHttpClient client = new OkHttpClient();
 
     @Override
@@ -39,17 +41,10 @@ public class FirstTimeLoginActivity extends AppCompatActivity {
 
         Button buttonCreateLobby = findViewById(R.id.buttonCreateLobby);
         Button buttonJoinLobby = findViewById(R.id.buttonJoinLobby);
-        Button buttonContinueWithoutLobby = findViewById(R.id.buttonContinueWithoutLobby);
 
         buttonCreateLobby.setOnClickListener(v -> CreateLobby());
         buttonJoinLobby.setOnClickListener(v -> JoinLobby());
-        buttonContinueWithoutLobby.setOnClickListener(v -> ContinueWithoutLobby());
 
-    }
-
-    private void ContinueWithoutLobby() {
-        intent = new Intent(getBaseContext(), CounterActivity.class);
-        startActivity(intent);
     }
 
     private void JoinLobby() {
@@ -65,10 +60,45 @@ public class FirstTimeLoginActivity extends AppCompatActivity {
         EditText inputCode = popupView.findViewById(R.id.inputCode);
         Button confirm = popupView.findViewById(R.id.buttonConfirmJoin);
 
+        sharedPref = getSharedPreferences("LoginInfo", MODE_PRIVATE);
+        String token = sharedPref.getString("token", "");
+
         confirm.setOnClickListener(v -> {
             FormBody formBody = new FormBody.Builder()
-                    .add("name", "")
+                    .add("code", inputCode.getText().toString())
                     .build();
+
+            Request request = new Request.Builder()
+                    .url("https://api.jurmanovic.com/clicker/v1/lobby/join")
+                    .header("Authorization", "BEARER "+token)
+                    .post(formBody)
+                    .build();
+
+            client.newCall(request).enqueue(new Callback() {
+                @Override
+                public void onFailure(@NonNull Call call, @NonNull IOException e) {
+                    showError(inputCode, "Couldn't connect to database");
+                    e.printStackTrace();
+                }
+
+                @Override
+                public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                    try {
+                        responseBody = Objects.requireNonNull(response.body()).string();
+                        JSONObject obj = new JSONObject(responseBody);
+                        if (obj.has("errorCode")) {
+                            showError(inputCode, obj.getString("message"));
+                        }
+                        else {
+                            System.out.println(responseBody);
+                            intent = new Intent(getBaseContext(), CounterActivity.class);
+                            startActivity(intent);
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
         });
     }
 
@@ -98,7 +128,7 @@ public class FirstTimeLoginActivity extends AppCompatActivity {
                         .build();
 
                 Request request = new Request.Builder()
-                        .url("https://scoreboard-counter.azurewebsites.net/v1/lobby")
+                        .url("https://api.jurmanovic.com/clicker/v1/lobby")
                         .header("Authorization", "BEARER "+token)
                         .post(formBody)
                         .build();
@@ -107,21 +137,40 @@ public class FirstTimeLoginActivity extends AppCompatActivity {
                     @Override
                     public void onFailure(@NonNull Call call, @NonNull IOException e) {
                             e.printStackTrace();
-                            runOnUiThread(() -> Toast.makeText(getBaseContext(), "Couldn't connect to database", Toast.LENGTH_SHORT).show());
+                            showError(inputLobbyName, "Couldn't connect to database");
                     }
 
                     @Override
                     public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                         try {
-                            String responseBody= Objects.requireNonNull(response.body()).string();
-                            System.out.println(responseBody);
-                        } catch (IOException e) {
+                            responseBody = Objects.requireNonNull(response.body()).string();
+                            JSONObject obj = new JSONObject(responseBody);
+                            if (obj.has("errorCode")) {
+                                showError(inputLobbyName, obj.getString("message"));
+                            }
+                            else {
+                                System.out.println(responseBody);
+                                runOnUiThread(() -> {
+                                    try {
+                                        Toast.makeText(getBaseContext(), "Successfully joined lobby "+obj.getString("name"), Toast.LENGTH_SHORT).show();
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                    }
+                                }) ;
+                                intent = new Intent(getBaseContext(), CounterActivity.class);
+                                startActivity(intent);
+                            }
+                        } catch (JSONException e) {
                             e.printStackTrace();
                         }
-
                     }
                 });
             }
         });
     }
+    private void showError(EditText input, String s) {
+        runOnUiThread(() -> input.setError(s));
+    }
 }
+
+

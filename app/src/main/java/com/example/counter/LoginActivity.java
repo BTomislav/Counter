@@ -75,7 +75,7 @@ public class LoginActivity extends AppCompatActivity {
                         .build();
 
                 Request request = new Request.Builder()
-                        .url("https://scoreboard-counter.azurewebsites.net/v1/auth/register")
+                        .url("https://api.jurmanovic.com/clicker/v1/auth/register")
                         .post(formBody)
                         .build();
 
@@ -119,7 +119,7 @@ public class LoginActivity extends AppCompatActivity {
                 .build();
 
         Request request = new Request.Builder()
-                .url("https://scoreboard-counter.azurewebsites.net/v1/auth/login")
+                .url("https://api.jurmanovic.com/clicker/v1/auth/login")
                 .post(formBody)
                 .build();
 

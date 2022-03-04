@@ -35,7 +35,7 @@ public class SplashScreenActivity extends AppCompatActivity {
 
         if (check){
             Request request = new Request.Builder()
-                    .url("https://scoreboard-counter.azurewebsites.net/v1/auth/check-token")
+                    .url("https://api.jurmanovic.com/clicker/v1/auth/check-token")
                     .addHeader("Authorization", "BEARER "+token)
                     .get()
                     .build();

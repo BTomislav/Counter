@@ -10,7 +10,7 @@
     <string name="welcome">Welcome to Counter</string>
     <string name="create_your_lobby">Create your own lobby and invite your friends!</string>
     <string name="create_lobby">CREATE LOBBY</string>
-    <string name="or_join_lobby">OR join your friend\'s lobby. You just need his invite code!</string>
+    <string name="or_join_lobby">OR join your friend\'s lobby. You just need an invite code!</string>
     <string name="join_lobby">JOIN LOBBY</string>
     <string name="title_activity_splash_screen">SplashScreenActivity</string>
     <string name="dummy_button">Dummy Button</string>
