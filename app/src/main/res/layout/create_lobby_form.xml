@@ -33,6 +33,7 @@
         app:layout_constraintTop_toBottomOf="@+id/textView3" />
 
     <Button
+        android:backgroundTint="@color/purple_500"
         android:id="@+id/buttonConfirmCreate"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

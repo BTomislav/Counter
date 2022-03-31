@@ -20,4 +20,5 @@
     <string name="enter_a_name_for_your_lobby">Enter a name for your lobby</string>
     <string name="example_code">123456</string>
     <string name="example_name">Example name</string>
+    <string name="welcome_message">Hi, %1$s</string>
 </resources>

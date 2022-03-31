@@ -17,6 +17,7 @@
         android:id="@+id/registerInputUsername"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:maxLength="15"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -31,6 +32,7 @@
         android:hint="@string/password"
         android:inputType="textPassword"
         android:textColor="@color/white"
+        android:maxLength="15"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/registerInputUsername" />
@@ -45,12 +47,14 @@
         android:hint="@string/confirm_password"
         android:inputType="textPassword"
         android:textColor="@color/white"
+        android:maxLength="15"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/registerInputPassword" />
 
 
     <Button
+        android:backgroundTint="#9948FD"
         android:id="@+id/buttonRegister"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

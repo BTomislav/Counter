@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginStart="30dp"
+    android:layout_marginEnd="30dp"
+    android:paddingStart="20dp"
+    android:paddingTop="10dp"
+    android:paddingBottom="10dp"
+    android:orientation="vertical"
+    android:background="@drawable/custom_recycler_item_bkg"
+    android:weightSum="10">
+
+    <TextView
+        android:autoSizeTextType="uniform"
+        android:maxLines="1"
+        android:gravity="start|center"
+        android:id="@+id/lobbyName"
+        android:layout_weight="6"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:backgroundTint="#00000000"
+        android:text=""
+        android:textColor="@color/white"
+        android:textStyle="bold" />
+    <TextView
+        android:autoSizeTextType="uniform"
+        android:maxLines="1"
+        android:layout_weight="4"
+        android:id="@+id/inviteCode"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:backgroundTint="#00000000"
+        android:text=""
+        android:textColor="#C1D5F1"
+
+        />
+</LinearLayout>

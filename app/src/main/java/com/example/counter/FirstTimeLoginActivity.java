@@ -41,11 +41,19 @@ public class FirstTimeLoginActivity extends AppCompatActivity {
 
         Button buttonCreateLobby = findViewById(R.id.buttonCreateLobby);
         Button buttonJoinLobby = findViewById(R.id.buttonJoinLobby);
+        Button buttonContinue = findViewById(R.id.buttonContinue);
+
 
         buttonCreateLobby.setOnClickListener(v -> CreateLobby());
         buttonJoinLobby.setOnClickListener(v -> JoinLobby());
-
+        buttonContinue.setOnClickListener(v -> Continue());
     }
+
+    private void Continue() {
+        intent = new Intent(getBaseContext(), CounterActivity.class);
+        startActivity(intent);
+    }
+
 
     private void JoinLobby() {
         LayoutInflater inflater = (LayoutInflater)
@@ -152,7 +160,7 @@ public class FirstTimeLoginActivity extends AppCompatActivity {
                                 System.out.println(responseBody);
                                 runOnUiThread(() -> {
                                     try {
-                                        Toast.makeText(getBaseContext(), "Successfully joined lobby "+obj.getString("name"), Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(getBaseContext(), "Successfully created lobby "+obj.getString("name"), Toast.LENGTH_SHORT).show();
                                     } catch (JSONException e) {
                                         e.printStackTrace();
                                     }

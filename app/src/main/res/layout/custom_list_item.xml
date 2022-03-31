@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:backgroundTint="#00000000"
+    android:weightSum="100">
+
+    <TextView
+        android:background="#00000000"
+        android:padding="5dp"
+        android:gravity="center"
+        android:id="@+id/placeNumber"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="20"
+        android:textSize="20sp"
+        android:text="0" />
+
+    <TextView
+        android:padding="5dp"
+        android:textAlignment="viewStart"
+        android:textColor="#C1D5F1"
+        android:background="#00000000"
+        android:id="@+id/username"
+        android:layout_width="0dp"
+        android:layout_weight="45"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:textSize="20sp" />
+
+    <TextView
+        android:gravity="center"
+        android:padding="5dp"
+        android:textAlignment="center"
+        android:textColor="#C1D5F1"
+        android:background="#00000000"
+        android:id="@+id/score"
+        android:textSize="20sp"
+        android:layout_width="0dp"
+        android:layout_weight="35"
+        android:layout_height="wrap_content"
+        android:text="" />
+
+</LinearLayout>

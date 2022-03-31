@@ -41,13 +41,17 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-
+        //initialization
         loginUsernameInput = findViewById(R.id.loginUsernameInput);
         loginPasswordInput = findViewById(R.id.loginPasswordInput);
         checkRememberMe = findViewById(R.id.checkRememberMe);
+
+        //declaring widgets
         Button buttonSignIn = findViewById(R.id.buttonSignIn);
         TextView textRegisterNow = findViewById(R.id.textClickToRegister);
 
+
+        //onclick listeners
         buttonSignIn.setOnClickListener(v -> Login(loginUsernameInput.getText().toString(), loginPasswordInput.getText().toString(), checkRememberMe.isChecked(), false));
         textRegisterNow.setOnClickListener(v -> RegisterForm());
     }
@@ -145,7 +149,7 @@ public class LoginActivity extends AppCompatActivity {
                     try {
                         obj = new JSONObject(responseBody);
                         String token = obj.getString("accessToken");
-                        SaveToken(token);
+                        SaveToken(token,loginUsername);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -184,10 +188,11 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
-    private void SaveToken(String token) {
+    private void SaveToken(String token, String username) {
         sharedPref = getSharedPreferences("LoginInfo", MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putString("token", token);
+        editor.putString("username", username);
         editor.apply();
     }
 

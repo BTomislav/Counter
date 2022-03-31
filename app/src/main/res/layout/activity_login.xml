@@ -19,6 +19,7 @@
         android:importantForAutofill="no"
         android:inputType="text"
         android:minHeight="48dp"
+        android:maxLength="10"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
@@ -37,12 +38,14 @@
         android:importantForAutofill="no"
         android:inputType="textPassword"
         android:minHeight="48dp"
+        android:maxLength="15"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/loginUsernameInput" />
 
     <Button
+        android:backgroundTint="#9948FD"
         android:id="@+id/buttonSignIn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -71,6 +74,7 @@
         app:layout_constraintTop_toBottomOf="@+id/checkRememberMe" />
 
     <CheckBox
+        android:buttonTint="@color/purple_200"
         android:minHeight="48dp"
         android:id="@+id/checkRememberMe"
         android:layout_width="wrap_content"
