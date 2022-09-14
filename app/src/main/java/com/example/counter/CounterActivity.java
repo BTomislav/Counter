@@ -65,6 +65,15 @@ public class CounterActivity extends AppCompatActivity {
     private LinearLayoutManager llm;
     private final OkHttpClient client = new OkHttpClient();
 
+    @Override
+    protected void onStart(){
+        super.onStart();
+        UpdateCounter();
+
+        //get lobbies
+        UpdateLobbyList(true);
+    }
+
     @RequiresApi(api = Build.VERSION_CODES.P)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,7 +88,7 @@ public class CounterActivity extends AppCompatActivity {
         token = sharedPref.getString("token", "");
         String username = sharedPref.getString("username", "username");
         count = findViewById(R.id.textCount);
-        //listLobbies.add(new LobbyModel("Global lobby", 0));
+        listLobbies.add(new LobbyModel("Global lobby", 0));
 
         SetRecyclerViewAdapter();
         //declaring widgets
@@ -97,12 +106,12 @@ public class CounterActivity extends AppCompatActivity {
         //adapter for list view - users and scores
         customListAdapter = new CustomListAdapter(this, R.layout.custom_list_item, listUsers);
         listScores.setAdapter(customListAdapter);
-        listLobbies.add(new LobbyModel("Global lobby", 0));
+        //listLobbies.add(new LobbyModel("Global lobby", 0));
         //get your score
-        UpdateCounter();
+       // UpdateCounter();
 
         //get lobbies
-        UpdateLobbyList(true);
+       // UpdateLobbyList(true);
 
         //listeners
         buttonAddLobby.setOnClickListener(v -> AddLobby());
@@ -231,8 +240,10 @@ public class CounterActivity extends AppCompatActivity {
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
+                        response.close();
                     }
                 });
+
             }
             else{
                 if (inputCodeOrName.getText().toString().isEmpty()){
@@ -281,6 +292,7 @@ public class CounterActivity extends AppCompatActivity {
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
+                            response.close();
                         }
                     });
                 }
@@ -324,6 +336,7 @@ public class CounterActivity extends AppCompatActivity {
                     }
 
                 });
+                response.close();
             }
         });
     }
@@ -346,6 +359,7 @@ public class CounterActivity extends AppCompatActivity {
             public void onResponse(@NonNull Call call, @NonNull Response response) {
                 UpdateLobbyUsers();
                 UpdateCounter();
+                response.close();
             }
         });
     }
@@ -371,6 +385,7 @@ public class CounterActivity extends AppCompatActivity {
             public void onResponse(@NonNull Call call, @NonNull Response response) {
                 UpdateLobbyUsers();
                 UpdateCounter();
+                response.close();
             }
         });
     }
@@ -417,7 +432,7 @@ public class CounterActivity extends AppCompatActivity {
                         }
                     });
                 }
-
+                response.close();
             }
         });
     }
@@ -486,6 +501,7 @@ public class CounterActivity extends AppCompatActivity {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
+                response.close();
             }
         });
     }
@@ -522,6 +538,7 @@ public class CounterActivity extends AppCompatActivity {
                         }
                     });
                 }
+                response.close();
             }
         });
     }
